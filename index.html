@@ -13,37 +13,45 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* 上寄せに変更 */
             min-height: 100vh;
             margin: 0;
-            padding: 16px;
+            padding: 20px; /* 上下のパディングを少し増やす */
             box-sizing: border-box;
         }
         .game-container {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            flex-direction: row; /* PCでは横並びを基本とする */
+            flex-wrap: nowrap;   /* 折り返さないようにする */
+            justify-content: center; /* 中央揃え */
+            align-items: flex-start; /* 上端揃え */
             gap: 24px;
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px; /* 全体の最大幅を少し広げる */
         }
         .board-and-info-panel {
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex-grow: 1; /* 残りのスペースを埋める */
+            min-width: 0; /* flexアイテムの縮小対策 */
         }
         .board-container {
             background-color: #ffffff;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            width: 100%; /* 親要素に追従 */
+            max-width: 500px; /* ボード自体の最大幅 */
         }
         .board {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            width: clamp(280px, 80vw, 450px);
-            height: clamp(224px, 64vw, 360px);
+            width: 100%; /* コンテナに合わせる */
+            aspect-ratio: 5 / 4; /* 縦横比を固定 */
+            /* width: clamp(280px, 80vw, 450px); */ /* 固定幅から変更 */
+            /* height: clamp(224px, 64vw, 360px); */
             border: 2px solid #60a5fa;
             border-radius: 8px;
             gap: 2px;
@@ -54,7 +62,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+            font-size: clamp(1.2rem, 5vmin, 2rem); /* vmin を使ってレスポンシブに */
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -65,7 +73,7 @@
             background-color: #dbeafe;
         }
         .piece-p1 { color: #2563eb; }
-        .piece-p2 .piece-symbol { /* 相手の駒の絵文字を回転 */
+        .piece-p2 .piece-symbol {
             display: inline-block;
             transform: rotate(180deg);
         }
@@ -87,7 +95,8 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             text-align: center;
-            width: clamp(280px, 80vw, 450px);
+            width: 100%; /* 親要素に追従 */
+            max-width: 500px; /* ボードに合わせる */
         }
         .info-panel h2 {
             font-size: clamp(1.1rem, 4.5vw, 1.6rem);
@@ -120,13 +129,14 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            width: clamp(280px, 80vw, 320px); /* 少し幅を広げる */
+            width: 280px; /* 固定幅に設定 */
+            flex-shrink: 0; /* このエリアは縮まないようにする */
             align-self: flex-start;
         }
         .how-to-play h3 {
             font-size: clamp(1.1rem, 4.5vw, 1.5rem);
             color: #1e3a8a;
-            margin-bottom: 16px; /* 少しマージン増やす */
+            margin-bottom: 16px;
             border-bottom: 2px solid #60a5fa;
             padding-bottom: 8px;
         }
@@ -151,57 +161,49 @@
             transform: rotate(180deg);
         }
 
-
-        /* 駒の動きの視覚的説明のためのスタイル */
         .move-grid {
             display: grid;
-            grid-template-columns: repeat(3, 30px);
-            grid-template-rows: repeat(3, 30px);
+            grid-template-columns: repeat(3, 28px); /* 少し大きく */
+            grid-template-rows: repeat(3, 28px);
             gap: 1px;
-            background-color: #cbd5e1; /* グリッドの背景 */
+            background-color: #cbd5e1;
             border: 1px solid #94a3b8;
             margin-bottom: 8px;
-            width: 92px; /* 30*3 + 1*2 */
-            height: 92px;
+            width: 86px; /* (28*3) + (1*2) */
+            height: 86px;
         }
         .move-grid-cell {
-            width: 30px;
-            height: 30px;
-            background-color: #e2e8f0; /* 通常のセル */
+            width: 28px;
+            height: 28px;
+            background-color: #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem; /* ミニ盤の駒のサイズ */
+            font-size: 1.1rem; /* 少し大きく */
         }
         .move-grid-cell.piece {
-            /* 中央の駒のスタイルはPIECESオブジェクトの色をJSで適用 */
+            /* スタイルはJSで適用 */
         }
         .move-grid-cell.highlight {
-            background-color: #86efac; /* 移動可能マス */
+            background-color: #86efac;
             outline: 1px solid #16a34a;
         }
 
-
-        @media (max-width: 768px) {
+        /* モバイル用調整: 画面幅が820px以下の場合 */
+        @media (max-width: 820px) { /* ブレークポイント調整 */
             .game-container {
                 flex-direction: column;
                 align-items: center;
             }
             .how-to-play {
-                width: clamp(280px, 90vw, 450px);
+                width: 100%; /* モバイルでは幅を広げる */
+                max-width: 500px; /* ボードに合わせる */
                 margin-top: 24px;
                 align-self: center;
             }
-            .move-grid {
-                grid-template-columns: repeat(3, 26px);
-                grid-template-rows: repeat(3, 26px);
-                width: 80px;
-                height: 80px;
-            }
-            .move-grid-cell {
-                width: 26px;
-                height: 26px;
-                font-size: 1rem;
+            .board-container, .info-panel {
+                 width: 100%; /* モバイルでは幅を広げる */
+                 max-width: 500px;
             }
         }
     </style>
@@ -243,21 +245,21 @@
                 name: "ライオン", 
                 p1Symbol: "🦁", 
                 p2Symbol: "🐺",
-                moves: [ [-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1] ] // 全方向
+                moves: [ [-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1] ] 
             },
             BEAR: { 
                 name: "くま", 
                 p1Symbol: "🐻", 
                 p2Symbol: "🐼",
-                movesP1: [ [-1,-1], [-1,0], [-1,1] ], // 前、斜め前 (P1視点)
-                movesP2: [ [1,-1], [1,0], [1,1] ]    // 前、斜め前 (P2視点)
+                movesP1: [ [-1,-1], [-1,0], [-1,1] ], 
+                movesP2: [ [1,-1], [1,0], [1,1] ]    
             },
             RABBIT: { 
                 name: "うさぎ", 
                 p1Symbol: "🐰", 
                 p2Symbol: "🦊",
-                movesP1: [ [-1,-1], [-1,1], [0,-1], [0,1] ], // 斜め前、横 (P1視点)
-                movesP2: [ [1,-1], [1,1], [0,-1], [0,1] ]    // 斜め前、横 (P2視点)
+                movesP1: [ [-1,-1], [-1,1], [0,-1], [0,1] ], 
+                movesP2: [ [1,-1], [1,1], [0,-1], [0,1] ]    
             }
         };
 
@@ -295,7 +297,7 @@
             const p2SymbolSpan = document.createElement('span');
             p2SymbolSpan.classList.add('piece-p2-example');
             const p2InnerSymbol = document.createElement('span');
-            p2InnerSymbol.classList.add('piece-symbol-example'); // 回転用クラス
+            p2InnerSymbol.classList.add('piece-symbol-example'); 
             p2InnerSymbol.textContent = pieceInfo.p2Symbol;
             p2SymbolSpan.appendChild(p2InnerSymbol);
             nameSpan.appendChild(p2SymbolSpan);
@@ -306,10 +308,10 @@
             const grid = document.createElement('div');
             grid.classList.add('move-grid');
 
-            const centerR = 1, centerC = 1; // 3x3グリッドの中心
+            const centerR = 1, centerC = 1; 
             let moveDeltas = [];
 
-            if (pieceInfo.moves) { // ライオンなど、P1/P2共通の動き
+            if (pieceInfo.moves) { 
                 moveDeltas = pieceInfo.moves;
             } else if (playerForExample === PLAYER_1 && pieceInfo.movesP1) {
                 moveDeltas = pieceInfo.movesP1;
@@ -317,18 +319,15 @@
                 moveDeltas = pieceInfo.movesP2;
             }
 
-
             for (let r = 0; r < 3; r++) {
                 for (let c = 0; c < 3; c++) {
                     const cell = document.createElement('div');
                     cell.classList.add('move-grid-cell');
                     if (r === centerR && c === centerC) {
                         cell.classList.add('piece');
-                        // P1視点での駒の表示を基本とする（回転はさせない）
                         cell.textContent = pieceInfo.p1Symbol; 
-                        cell.style.color = PIECES[pieceKey].player === PLAYER_1 ? '#2563eb' : '#e11d48'; // デモなのでP1の色で固定
+                        cell.style.color = '#2563eb'; // P1カラーで固定
                     } else {
-                        // (r - centerR, c - centerC) が移動可能なデルタかチェック
                         const dr = r - centerR;
                         const dc = c - centerC;
                         if (moveDeltas.some(delta => delta[0] === dr && delta[1] === dc)) {
@@ -343,8 +342,7 @@
         }
 
         function populateMoveExamples() {
-            pieceMoveExamplesContainer.innerHTML = ''; // クリア
-            // P1視点での動きを表示する (通常、将棋の駒説明は先手視点なので)
+            pieceMoveExamplesContainer.innerHTML = ''; 
             pieceMoveExamplesContainer.appendChild(createMoveExampleGrid('LION', PLAYER_1));
             pieceMoveExamplesContainer.appendChild(createMoveExampleGrid('BEAR', PLAYER_1));
             pieceMoveExamplesContainer.appendChild(createMoveExampleGrid('RABBIT', PLAYER_1));
@@ -371,7 +369,7 @@
             board[0][3] = { type: PIECES.RABBIT, player: PLAYER_2 };
             board[0][4] = { type: PIECES.BEAR, player: PLAYER_2 };
             
-            populateMoveExamples(); // 駒の動きの例を生成
+            populateMoveExamples(); 
             renderBoard();
         }
 
@@ -387,7 +385,7 @@
                     const pieceData = board[r][c];
                     if (pieceData) {
                         const symbolSpan = document.createElement('span');
-                        symbolSpan.classList.add('piece-symbol'); // 回転制御用
+                        symbolSpan.classList.add('piece-symbol'); 
                         symbolSpan.textContent = pieceData.player === PLAYER_1 ? pieceData.type.p1Symbol : pieceData.type.p2Symbol;
                         cellElement.appendChild(symbolSpan);
                         cellElement.classList.add(pieceData.player === PLAYER_1 ? 'piece-p1' : 'piece-p2');
@@ -474,7 +472,7 @@
             if (!pieceType) return moves;
 
             let moveDeltas = [];
-            if (pieceType.moves) { // ライオンなど、P1/P2共通の動き
+            if (pieceType.moves) { 
                 moveDeltas = pieceType.moves;
             } else if (player === PLAYER_1 && pieceType.movesP1) {
                 moveDeltas = pieceType.movesP1;
@@ -516,7 +514,7 @@
 
         resetButtonElement.addEventListener('click', initializeBoard);
 
-        initializeBoard(); // 初期化時に駒の動きの例も生成
+        initializeBoard();
     </script>
 </body>
 </html>
