@@ -8,84 +8,99 @@
     <style>
         /* カスタムスタイル */
         body {
-            font-family: 'Arial', sans-serif; /* フォント指定 */
-            background-color: #f0f9ff; /* 背景色 */
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f9ff; /* 背景色 (水色系) */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 16px;
             box-sizing: border-box;
         }
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            width: 100%;
+            max-width: 900px;
+        }
+        .board-and-info-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .board-container {
-            background-color: #fff; /* ボードコンテナの背景色 */
+            background-color: #ffffff;
             padding: 20px;
-            border-radius: 12px; /* 角丸 */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1); /* 影 */
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
         .board {
             display: grid;
-            grid-template-columns: repeat(5, 1fr); /* 5列 */
-            grid-template-rows: repeat(4, 1fr);    /* 4行 */
-            width: clamp(300px, 90vw, 500px); /* レスポンシブな幅 */
-            height: clamp(240px, 72vw, 400px); /* レスポンシブな高さ */
-            border: 2px solid #60a5fa; /* ボードの境界線 (青系) */
-            border-radius: 8px; /* ボードの角丸 */
-            gap: 2px; /* セル間の隙間 */
-            background-color: #93c5fd; /* ボードの背景 (薄い青) */
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            width: clamp(280px, 80vw, 450px);
+            height: clamp(224px, 64vw, 360px);
+            border: 2px solid #60a5fa;
+            border-radius: 8px;
+            gap: 2px;
+            background-color: #93c5fd;
         }
         .cell {
-            background-color: #eff6ff; /* セルの背景色 (非常に薄い青) */
+            background-color: #eff6ff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(1.2rem, 4vw, 2rem); /* レスポンシブなフォントサイズ */
+            font-size: clamp(1.1rem, 3.5vw, 1.8rem);
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s;
-            border: 1px solid #dbeafe; /* セルの境界線 */
-            border-radius: 4px; /* セルの角丸 */
+            border: 1px solid #dbeafe;
+            border-radius: 4px;
         }
         .cell:hover {
-            background-color: #dbeafe; /* ホバー時の背景色 */
+            background-color: #dbeafe;
         }
-        .piece-p1 { color: #2563eb; } /* プレイヤー1の駒の色 (青) */
-        .piece-p2 { color: #db2777; } /* プレイヤー2の駒の色 (ピンク) */
+        .piece-p1 { color: #2563eb; }
+        .piece-p2 .piece-symbol { /* 相手の駒の絵文字を回転 */
+            display: inline-block;
+            transform: rotate(180deg);
+        }
+        .piece-p2 { color: #e11d48; }
+
+
         .selected {
-            background-color: #fed7aa !important; /* 選択された駒の背景色 (オレンジ系) */
-            outline: 2px solid #f97316; /* 選択された駒の枠線 */
+            background-color: #fcd34d !important;
+            outline: 3px solid #f59e0b;
         }
         .valid-move {
-            background-color: #a7f3d0 !important; /* 移動可能なマスの背景色 (緑系) */
-            outline: 2px solid #059669;
-        }
-        .captured {
-            opacity: 0.5;
-            text-decoration: line-through;
+            background-color: #86efac !important;
+            outline: 3px solid #16a34a;
         }
         .info-panel {
             margin-top: 20px;
             padding: 15px;
-            background-color: #fff;
+            background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             text-align: center;
-            width: clamp(300px, 90vw, 500px);
+            width: clamp(280px, 80vw, 450px);
         }
         .info-panel h2 {
-            font-size: clamp(1.2rem, 5vw, 1.8rem); /* レスポンシブなタイトルサイズ */
+            font-size: clamp(1.1rem, 4.5vw, 1.6rem);
             margin-bottom: 10px;
-            color: #1e3a8a; /* タイトルの色 (濃い青) */
+            color: #1e3a8a;
         }
         .info-panel p {
-            font-size: clamp(1rem, 4vw, 1.2rem); /* レスポンシブなテキストサイズ */
-            color: #374151; /* テキストの色 */
+            font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+            color: #374151;
             margin-bottom: 8px;
         }
         button {
-            background-color: #3b82f6; /* ボタンの背景色 (青) */
+            background-color: #3b82f6;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -96,58 +111,246 @@
             margin-top: 10px;
         }
         button:hover {
-            background-color: #2563eb; /* ホバー時のボタン背景色 */
+            background-color: #2563eb;
         }
-        /* モバイル用調整 */
-        @media (max-width: 600px) {
-            .board {
-                gap: 1px;
+
+        /* 操作説明エリア */
+        .how-to-play {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            width: clamp(280px, 80vw, 320px); /* 少し幅を広げる */
+            align-self: flex-start;
+        }
+        .how-to-play h3 {
+            font-size: clamp(1.1rem, 4.5vw, 1.5rem);
+            color: #1e3a8a;
+            margin-bottom: 16px; /* 少しマージン増やす */
+            border-bottom: 2px solid #60a5fa;
+            padding-bottom: 8px;
+        }
+        .how-to-play p {
+            font-size: clamp(0.85rem, 3vw, 1rem);
+            color: #374151;
+            margin-bottom: 10px;
+        }
+        .how-to-play .piece-move-explanation {
+            margin-bottom: 20px;
+        }
+        .how-to-play .piece-name {
+            font-weight: bold;
+            font-size: clamp(1rem, 3.8vw, 1.2rem);
+            margin-bottom: 8px;
+            display: block;
+        }
+        .piece-p1-example { color: #2563eb; }
+        .piece-p2-example { color: #e11d48; }
+        .piece-p2-example .piece-symbol-example {
+            display: inline-block;
+            transform: rotate(180deg);
+        }
+
+
+        /* 駒の動きの視覚的説明のためのスタイル */
+        .move-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 30px);
+            grid-template-rows: repeat(3, 30px);
+            gap: 1px;
+            background-color: #cbd5e1; /* グリッドの背景 */
+            border: 1px solid #94a3b8;
+            margin-bottom: 8px;
+            width: 92px; /* 30*3 + 1*2 */
+            height: 92px;
+        }
+        .move-grid-cell {
+            width: 30px;
+            height: 30px;
+            background-color: #e2e8f0; /* 通常のセル */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem; /* ミニ盤の駒のサイズ */
+        }
+        .move-grid-cell.piece {
+            /* 中央の駒のスタイルはPIECESオブジェクトの色をJSで適用 */
+        }
+        .move-grid-cell.highlight {
+            background-color: #86efac; /* 移動可能マス */
+            outline: 1px solid #16a34a;
+        }
+
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .how-to-play {
+                width: clamp(280px, 90vw, 450px);
+                margin-top: 24px;
+                align-self: center;
+            }
+            .move-grid {
+                grid-template-columns: repeat(3, 26px);
+                grid-template-rows: repeat(3, 26px);
+                width: 80px;
+                height: 80px;
+            }
+            .move-grid-cell {
+                width: 26px;
+                height: 26px;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="board-container">
-        <div id="gameBoard" class="board">
+    <div class="game-container">
+        <div class="board-and-info-panel">
+            <div class="board-container">
+                <div id="gameBoard" class="board">
+                    </div>
             </div>
-    </div>
+            <div id="infoPanel" class="info-panel">
+                <h2 id="gameTitle">どうぶつおやつパーティー</h2>
+                <p id="turnDisplay">プレイヤー1の番です</p>
+                <p id="messageDisplay"></p>
+                <button id="resetButton">ゲームリセット</button>
+            </div>
+        </div>
 
-    <div id="infoPanel" class="info-panel">
-        <h2 id="gameTitle">どうぶつおやつパーティー</h2>
-        <p id="turnDisplay">プレイヤー1の番です</p>
-        <p id="messageDisplay"></p>
-        <button id="resetButton">ゲームリセット</button>
+        <div class="how-to-play">
+            <h3>あそびかた</h3>
+            <p><strong>もくてき:</strong> あいての <span class="piece-p1-example">ライオン</span><span class="piece-symbol-example">🦁</span> をつかまえたら勝ち！</p>
+            
+            <h4>駒のうごき</h4>
+            <div id="pieceMoveExamplesContainer">
+                </div>
+            <p><small>※ <span class="piece-p1-example">青い駒</span>があなた (下側)、<span class="piece-p2-example">赤い駒 (<span class="piece-symbol-example">例：</span><span class="piece-p2-example piece-symbol-example">🐺</span>)</span>があいて (上側) です。</small></p>
+        </div>
     </div>
 
     <script>
         // --- 定数定義 ---
         const BOARD_ROWS = 4;
         const BOARD_COLS = 5;
-        const EMPTY_CELL = null; // 空きマス
+        const EMPTY_CELL = null;
 
-        // 駒の種類 (絵文字を使うとより可愛らしくなります)
         const PIECES = {
-            LION: { name: "ライオン", symbol: "🦁", p1Symbol: "🦁", p2Symbol: "🐺" }, // 王様駒
-            BEAR: { name: "くま", symbol: "🐻", p1Symbol: "🐻", p2Symbol: "🐼" },   // アタッカー
-            RABBIT: { name: "うさぎ", symbol: "🐰", p1Symbol: "🐰", p2Symbol: "🦊" } // ジャンパー
+            LION: { 
+                name: "ライオン", 
+                p1Symbol: "🦁", 
+                p2Symbol: "🐺",
+                moves: [ [-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1] ] // 全方向
+            },
+            BEAR: { 
+                name: "くま", 
+                p1Symbol: "🐻", 
+                p2Symbol: "🐼",
+                movesP1: [ [-1,-1], [-1,0], [-1,1] ], // 前、斜め前 (P1視点)
+                movesP2: [ [1,-1], [1,0], [1,1] ]    // 前、斜め前 (P2視点)
+            },
+            RABBIT: { 
+                name: "うさぎ", 
+                p1Symbol: "🐰", 
+                p2Symbol: "🦊",
+                movesP1: [ [-1,-1], [-1,1], [0,-1], [0,1] ], // 斜め前、横 (P1視点)
+                movesP2: [ [1,-1], [1,1], [0,-1], [0,1] ]    // 斜め前、横 (P2視点)
+            }
         };
 
         const PLAYER_1 = "P1";
         const PLAYER_2 = "P2";
 
-        // --- グローバル変数 ---
-        let board = []; // ゲーム盤の状態を保持する2D配列
+        let board = [];
         let currentPlayer = PLAYER_1;
-        let selectedPiece = null; // { r, c, piece (駒オブジェクトそのもの), player }
+        let selectedPiece = null;
         let gameOver = false;
 
-        // --- DOM要素 ---
         const gameBoardElement = document.getElementById('gameBoard');
         const turnDisplayElement = document.getElementById('turnDisplay');
         const messageDisplayElement = document.getElementById('messageDisplay');
         const resetButtonElement = document.getElementById('resetButton');
+        const pieceMoveExamplesContainer = document.getElementById('pieceMoveExamplesContainer');
 
-        // --- ゲーム初期化 ---
+
+        function createMoveExampleGrid(pieceKey, playerForExample) {
+            const pieceInfo = PIECES[pieceKey];
+            const exampleDiv = document.createElement('div');
+            exampleDiv.classList.add('piece-move-explanation');
+
+            const nameSpan = document.createElement('span');
+            nameSpan.classList.add('piece-name');
+            nameSpan.textContent = `${pieceInfo.name} (`;
+            
+            const p1SymbolSpan = document.createElement('span');
+            p1SymbolSpan.classList.add('piece-p1-example');
+            p1SymbolSpan.textContent = pieceInfo.p1Symbol;
+            nameSpan.appendChild(p1SymbolSpan);
+            
+            nameSpan.append(" / ");
+
+            const p2SymbolSpan = document.createElement('span');
+            p2SymbolSpan.classList.add('piece-p2-example');
+            const p2InnerSymbol = document.createElement('span');
+            p2InnerSymbol.classList.add('piece-symbol-example'); // 回転用クラス
+            p2InnerSymbol.textContent = pieceInfo.p2Symbol;
+            p2SymbolSpan.appendChild(p2InnerSymbol);
+            nameSpan.appendChild(p2SymbolSpan);
+
+            nameSpan.append(")");
+            exampleDiv.appendChild(nameSpan);
+
+            const grid = document.createElement('div');
+            grid.classList.add('move-grid');
+
+            const centerR = 1, centerC = 1; // 3x3グリッドの中心
+            let moveDeltas = [];
+
+            if (pieceInfo.moves) { // ライオンなど、P1/P2共通の動き
+                moveDeltas = pieceInfo.moves;
+            } else if (playerForExample === PLAYER_1 && pieceInfo.movesP1) {
+                moveDeltas = pieceInfo.movesP1;
+            } else if (playerForExample === PLAYER_2 && pieceInfo.movesP2) {
+                moveDeltas = pieceInfo.movesP2;
+            }
+
+
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('move-grid-cell');
+                    if (r === centerR && c === centerC) {
+                        cell.classList.add('piece');
+                        // P1視点での駒の表示を基本とする（回転はさせない）
+                        cell.textContent = pieceInfo.p1Symbol; 
+                        cell.style.color = PIECES[pieceKey].player === PLAYER_1 ? '#2563eb' : '#e11d48'; // デモなのでP1の色で固定
+                    } else {
+                        // (r - centerR, c - centerC) が移動可能なデルタかチェック
+                        const dr = r - centerR;
+                        const dc = c - centerC;
+                        if (moveDeltas.some(delta => delta[0] === dr && delta[1] === dc)) {
+                            cell.classList.add('highlight');
+                        }
+                    }
+                    grid.appendChild(cell);
+                }
+            }
+            exampleDiv.appendChild(grid);
+            return exampleDiv;
+        }
+
+        function populateMoveExamples() {
+            pieceMoveExamplesContainer.innerHTML = ''; // クリア
+            // P1視点での動きを表示する (通常、将棋の駒説明は先手視点なので)
+            pieceMoveExamplesContainer.appendChild(createMoveExampleGrid('LION', PLAYER_1));
+            pieceMoveExamplesContainer.appendChild(createMoveExampleGrid('BEAR', PLAYER_1));
+            pieceMoveExamplesContainer.appendChild(createMoveExampleGrid('RABBIT', PLAYER_1));
+        }
+
+
         function initializeBoard() {
             board = Array(BOARD_ROWS).fill(null).map(() => Array(BOARD_COLS).fill(EMPTY_CELL));
             gameOver = false;
@@ -156,26 +359,24 @@
             messageDisplayElement.textContent = "";
             updateTurnDisplay();
 
-            // プレイヤー1 (先手) の駒配置 (盤面の下側)
             board[3][0] = { type: PIECES.BEAR, player: PLAYER_1 };
             board[3][1] = { type: PIECES.RABBIT, player: PLAYER_1 };
             board[3][2] = { type: PIECES.LION, player: PLAYER_1 };
             board[3][3] = { type: PIECES.RABBIT, player: PLAYER_1 };
             board[3][4] = { type: PIECES.BEAR, player: PLAYER_1 };
 
-            // プレイヤー2 (後手) の駒配置 (盤面の上側)
             board[0][0] = { type: PIECES.BEAR, player: PLAYER_2 };
             board[0][1] = { type: PIECES.RABBIT, player: PLAYER_2 };
             board[0][2] = { type: PIECES.LION, player: PLAYER_2 };
             board[0][3] = { type: PIECES.RABBIT, player: PLAYER_2 };
             board[0][4] = { type: PIECES.BEAR, player: PLAYER_2 };
-
+            
+            populateMoveExamples(); // 駒の動きの例を生成
             renderBoard();
         }
 
-        // --- 盤面描画 ---
         function renderBoard() {
-            gameBoardElement.innerHTML = ''; // 既存の盤面をクリア
+            gameBoardElement.innerHTML = '';
             for (let r = 0; r < BOARD_ROWS; r++) {
                 for (let c = 0; c < BOARD_COLS; c++) {
                     const cellElement = document.createElement('div');
@@ -185,7 +386,10 @@
 
                     const pieceData = board[r][c];
                     if (pieceData) {
-                        cellElement.textContent = pieceData.player === PLAYER_1 ? pieceData.type.p1Symbol : pieceData.type.p2Symbol;
+                        const symbolSpan = document.createElement('span');
+                        symbolSpan.classList.add('piece-symbol'); // 回転制御用
+                        symbolSpan.textContent = pieceData.player === PLAYER_1 ? pieceData.type.p1Symbol : pieceData.type.p2Symbol;
+                        cellElement.appendChild(symbolSpan);
                         cellElement.classList.add(pieceData.player === PLAYER_1 ? 'piece-p1' : 'piece-p2');
                     }
 
@@ -206,7 +410,6 @@
             }
         }
 
-        // --- セルクリック処理 ---
         function handleCellClick(r, c) {
             if (gameOver) return;
 
@@ -220,25 +423,24 @@
                     movePiece(selectedPiece.r, selectedPiece.c, r, c);
                 } else if (clickedCellContent && clickedCellContent.player === currentPlayer) {
                     selectedPiece = { r, c, piece: clickedCellContent.type, player: clickedCellContent.player };
-                    messageDisplayElement.textContent = `${selectedPiece.piece.name}を選択中。`;
+                    messageDisplayElement.textContent = `${selectedPiece.piece.name}をせんたく中。`;
                 } else {
-                    messageDisplayElement.textContent = "そこには移動できません。他の駒を選ぶか、有効なマスを選んでください。";
+                    messageDisplayElement.textContent = "そこにはうごけません。ほかの駒をえらぶか、ゆうこうなマスをえらんでください。";
                     selectedPiece = null; 
                 }
             } else {
                 if (clickedCellContent && clickedCellContent.player === currentPlayer) {
                     selectedPiece = { r, c, piece: clickedCellContent.type, player: clickedCellContent.player };
-                    messageDisplayElement.textContent = `${selectedPiece.piece.name}を選択しました。移動先を選んでください。`;
+                    messageDisplayElement.textContent = `${selectedPiece.piece.name}をせんたくしました。いどう先をえらんでください。`;
                 } else if (clickedCellContent) {
-                    messageDisplayElement.textContent = "相手の駒です。自分の駒を選んでください。";
+                    messageDisplayElement.textContent = "あいての駒です。じぶんの駒をえらんでください。";
                 } else {
-                     messageDisplayElement.textContent = "駒を選んでください。";
+                     messageDisplayElement.textContent = "駒をえらんでください。";
                 }
             }
             renderBoard();
         }
 
-        // --- 駒の移動 ---
         function movePiece(fromR, fromC, toR, toC) {
             const pieceToMove = board[fromR][fromC];
             const targetContent = board[toR][toC];
@@ -248,16 +450,16 @@
                 board[fromR][fromC] = EMPTY_CELL;
                 renderBoard();
                 gameOver = true;
-                messageDisplayElement.textContent = `${currentPlayer === PLAYER_1 ? "プレイヤー1" : "プレイヤー2"} の勝利！ ${targetContent.type.name} を取りました！`;
-                turnDisplayElement.textContent = "ゲーム終了";
+                messageDisplayElement.textContent = `${currentPlayer === PLAYER_1 ? "プレイヤー1" : "プレイヤー2"} の勝ち！ ${targetContent.type.name} をつかまえた！`;
+                turnDisplayElement.textContent = "ゲームしゅうりょう";
                 selectedPiece = null;
                 return;
             }
 
             if (targetContent) {
-                 messageDisplayElement.textContent = `${pieceToMove.type.name}で相手の${targetContent.type.name}を取りました！`;
+                 messageDisplayElement.textContent = `${pieceToMove.type.name}であいての${targetContent.type.name}をつかまえた！`;
             } else {
-                 messageDisplayElement.textContent = `${pieceToMove.type.name}を移動しました。`;
+                 messageDisplayElement.textContent = `${pieceToMove.type.name}をうごかしました。`;
             }
 
             board[toR][toC] = pieceToMove;
@@ -267,60 +469,38 @@
             switchPlayer();
         }
 
-        // --- 有効な移動先の取得 (駒の動きルール更新) ---
         function getValidMoves(r, c, player, pieceType) {
             const moves = [];
-            let dr, dc; 
-
             if (!pieceType) return moves;
 
-            // ライオンの動き: 前後左右に1マス
-            if (pieceType === PIECES.LION) {
-                const deltas = [ [-1, 0], [1, 0], [0, -1], [0, 1] ]; // 上, 下, 左, 右
-                for (const [deltaR, deltaC] of deltas) {
-                    const nr = r + deltaR;
-                    const nc = c + deltaC;
-                    if (isValidSquare(nr, nc, player)) moves.push({ r: nr, c: nc });
-                }
+            let moveDeltas = [];
+            if (pieceType.moves) { // ライオンなど、P1/P2共通の動き
+                moveDeltas = pieceType.moves;
+            } else if (player === PLAYER_1 && pieceType.movesP1) {
+                moveDeltas = pieceType.movesP1;
+            } else if (player === PLAYER_2 && pieceType.movesP2) {
+                moveDeltas = pieceType.movesP2;
             }
-            // くまの動き: 前に1マス、または斜め前（左右どちらか）に1マス
-            else if (pieceType === PIECES.BEAR) {
-                dr = (player === PLAYER_1) ? -1 : 1; // P1は上へ(行が減る)、P2は下へ(行が増える)
-                // 前
-                if (isValidSquare(r + dr, c, player)) moves.push({ r: r + dr, c: c });
-                // 斜め前（左）
-                if (isValidSquare(r + dr, c - 1, player)) moves.push({ r: r + dr, c: c - 1 });
-                // 斜め前（右）
-                if (isValidSquare(r + dr, c + 1, player)) moves.push({ r: r + dr, c: c + 1 });
-            }
-            // うさぎの動き: 斜め前（左右どちらか）に1マス、または真横（左右どちらか）に1マス
-            else if (pieceType === PIECES.RABBIT) {
-                dr = (player === PLAYER_1) ? -1 : 1; // P1は上へ、P2は下へ
-                // 斜め前（左）
-                if (isValidSquare(r + dr, c - 1, player)) moves.push({ r: r + dr, c: c - 1 });
-                // 斜め前（右）
-                if (isValidSquare(r + dr, c + 1, player)) moves.push({ r: r + dr, c: c + 1 });
-                // 真横（左）
-                if (isValidSquare(r, c - 1, player)) moves.push({ r: r, c: c - 1 });
-                // 真横（右）
-                if (isValidSquare(r, c + 1, player)) moves.push({ r: r, c: c + 1 });
+
+            for (const [dr, dc] of moveDeltas) {
+                const nr = r + dr;
+                const nc = c + dc;
+                if (isValidSquare(nr, nc, player)) moves.push({ r: nr, c: nc });
             }
             return moves;
         }
 
-        // --- マスの有効性チェック ---
         function isValidSquare(r, c, player) {
             if (r < 0 || r >= BOARD_ROWS || c < 0 || c >= BOARD_COLS) {
-                return false; // 盤外
+                return false;
             }
             const targetCell = board[r][c];
             if (targetCell && targetCell.player === player) {
-                return false; // 移動先に自分の駒
+                return false;
             }
-            return true; // 空きマス、または相手の駒のマス
+            return true; 
         }
 
-        // --- プレイヤー交代 ---
         function switchPlayer() {
             currentPlayer = (currentPlayer === PLAYER_1) ? PLAYER_2 : PLAYER_1;
             updateTurnDisplay();
@@ -330,16 +510,13 @@
             renderBoard(); 
         }
 
-        // --- 表示更新 ---
         function updateTurnDisplay() {
-            turnDisplayElement.textContent = gameOver ? "ゲーム終了" : `${currentPlayer === PLAYER_1 ? "プレイヤー1 (下側)" : "プレイヤー2 (上側)"} の番です`;
+            turnDisplayElement.textContent = gameOver ? "ゲームしゅうりょう" : `${currentPlayer === PLAYER_1 ? "プレイヤー1 (下側)" : "プレイヤー2 (上側)"} の番です`;
         }
 
-        // --- イベントリスナー ---
         resetButtonElement.addEventListener('click', initializeBoard);
 
-        // --- ゲーム開始 ---
-        initializeBoard();
+        initializeBoard(); // 初期化時に駒の動きの例も生成
     </script>
 </body>
 </html>
