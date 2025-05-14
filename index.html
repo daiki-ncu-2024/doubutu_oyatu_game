@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>どうぶつおやつパーティー</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* カスタムスタイル */
+        body {
+            font-family: 'Arial', sans-serif; /* フォント指定 */
+            background-color: #f0f9ff; /* 背景色 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .board-container {
+            background-color: #fff; /* ボードコンテナの背景色 */
+            padding: 20px;
+            border-radius: 12px; /* 角丸 */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1); /* 影 */
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5列 */
+            grid-template-rows: repeat(4, 1fr);    /* 4行 */
+            width: clamp(300px, 90vw, 500px); /* レスポンシブな幅 */
+            height: clamp(240px, 72vw, 400px); /* レスポンシブな高さ */
+            border: 2px solid #60a5fa; /* ボードの境界線 (青系) */
+            border-radius: 8px; /* ボードの角丸 */
+            gap: 2px; /* セル間の隙間 */
+            background-color: #93c5fd; /* ボードの背景 (薄い青) */
+        }
+        .cell {
+            background-color: #eff6ff; /* セルの背景色 (非常に薄い青) */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 4vw, 2rem); /* レスポンシブなフォントサイズ */
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 1px solid #dbeafe; /* セルの境界線 */
+            border-radius: 4px; /* セルの角丸 */
+        }
+        .cell:hover {
+            background-color: #dbeafe; /* ホバー時の背景色 */
+        }
+        .piece-p1 { color: #2563eb; } /* プレイヤー1の駒の色 (青) */
+        .piece-p2 { color: #db2777; } /* プレイヤー2の駒の色 (ピンク) */
+        .selected {
+            background-color: #fed7aa !important; /* 選択された駒の背景色 (オレンジ系) */
+            outline: 2px solid #f97316; /* 選択された駒の枠線 */
+        }
+        .valid-move {
+            background-color: #a7f3d0 !important; /* 移動可能なマスの背景色 (緑系) */
+            outline: 2px solid #059669;
+        }
+        .captured {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        .info-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            text-align: center;
+            width: clamp(300px, 90vw, 500px);
+        }
+        .info-panel h2 {
+            font-size: clamp(1.2rem, 5vw, 1.8rem); /* レスポンシブなタイトルサイズ */
+            margin-bottom: 10px;
+            color: #1e3a8a; /* タイトルの色 (濃い青) */
+        }
+        .info-panel p {
+            font-size: clamp(1rem, 4vw, 1.2rem); /* レスポンシブなテキストサイズ */
+            color: #374151; /* テキストの色 */
+            margin-bottom: 8px;
+        }
+        button {
+            background-color: #3b82f6; /* ボタンの背景色 (青) */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2563eb; /* ホバー時のボタン背景色 */
+        }
+        /* モバイル用調整 */
+        @media (max-width: 600px) {
+            .board {
+                gap: 1px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="board-container">
+        <div id="gameBoard" class="board">
+            </div>
+    </div>
+
+    <div id="infoPanel" class="info-panel">
+        <h2 id="gameTitle">どうぶつおやつパーティー</h2>
+        <p id="turnDisplay">プレイヤー1の番です</p>
+        <p id="messageDisplay"></p>
+        <button id="resetButton">ゲームリセット</button>
+    </div>
+
+    <script>
+        // --- 定数定義 ---
+        const BOARD_ROWS = 4;
+        const BOARD_COLS = 5;
+        const EMPTY_CELL = null; // 空きマス
+
+        // 駒の種類 (絵文字を使うとより可愛らしくなります)
+        const PIECES = {
+            LION: { name: "ライオン", symbol: "🦁", p1Symbol: "🦁", p2Symbol: "🐺" }, // 王様駒
+            BEAR: { name: "くま", symbol: "🐻", p1Symbol: "🐻", p2Symbol: "🐼" },   // アタッカー
+            RABBIT: { name: "うさぎ", symbol: "🐰", p1Symbol: "🐰", p2Symbol: "🦊" } // ジャンパー
+        };
+
+        const PLAYER_1 = "P1";
+        const PLAYER_2 = "P2";
+
+        // --- グローバル変数 ---
+        let board = []; // ゲーム盤の状態を保持する2D配列
+        let currentPlayer = PLAYER_1;
+        let selectedPiece = null; // { r, c, piece (駒オブジェクトそのもの), player }
+        let gameOver = false;
+
+        // --- DOM要素 ---
+        const gameBoardElement = document.getElementById('gameBoard');
+        const turnDisplayElement = document.getElementById('turnDisplay');
+        const messageDisplayElement = document.getElementById('messageDisplay');
+        const resetButtonElement = document.getElementById('resetButton');
+
+        // --- ゲーム初期化 ---
+        function initializeBoard() {
+            board = Array(BOARD_ROWS).fill(null).map(() => Array(BOARD_COLS).fill(EMPTY_CELL));
+            gameOver = false;
+            currentPlayer = PLAYER_1;
+            selectedPiece = null;
+            messageDisplayElement.textContent = "";
+            updateTurnDisplay();
+
+            // プレイヤー1 (先手) の駒配置 (盤面の下側)
+            board[3][0] = { type: PIECES.BEAR, player: PLAYER_1 };
+            board[3][1] = { type: PIECES.RABBIT, player: PLAYER_1 };
+            board[3][2] = { type: PIECES.LION, player: PLAYER_1 };
+            board[3][3] = { type: PIECES.RABBIT, player: PLAYER_1 };
+            board[3][4] = { type: PIECES.BEAR, player: PLAYER_1 };
+
+            // プレイヤー2 (後手) の駒配置 (盤面の上側)
+            board[0][0] = { type: PIECES.BEAR, player: PLAYER_2 };
+            board[0][1] = { type: PIECES.RABBIT, player: PLAYER_2 };
+            board[0][2] = { type: PIECES.LION, player: PLAYER_2 };
+            board[0][3] = { type: PIECES.RABBIT, player: PLAYER_2 };
+            board[0][4] = { type: PIECES.BEAR, player: PLAYER_2 };
+
+            renderBoard();
+        }
+
+        // --- 盤面描画 ---
+        function renderBoard() {
+            gameBoardElement.innerHTML = ''; // 既存の盤面をクリア
+            for (let r = 0; r < BOARD_ROWS; r++) {
+                for (let c = 0; c < BOARD_COLS; c++) {
+                    const cellElement = document.createElement('div');
+                    cellElement.classList.add('cell');
+                    cellElement.dataset.r = r;
+                    cellElement.dataset.c = c;
+
+                    const pieceData = board[r][c];
+                    if (pieceData) {
+                        cellElement.textContent = pieceData.player === PLAYER_1 ? pieceData.type.p1Symbol : pieceData.type.p2Symbol;
+                        cellElement.classList.add(pieceData.player === PLAYER_1 ? 'piece-p1' : 'piece-p2');
+                    }
+
+                    if (selectedPiece && selectedPiece.r === r && selectedPiece.c === c) {
+                        cellElement.classList.add('selected');
+                    }
+
+                    if (selectedPiece) {
+                        const validMoves = getValidMoves(selectedPiece.r, selectedPiece.c, selectedPiece.player, selectedPiece.piece);
+                        if (validMoves.some(move => move.r === r && move.c === c)) {
+                            cellElement.classList.add('valid-move');
+                        }
+                    }
+                    
+                    cellElement.addEventListener('click', () => handleCellClick(r, c));
+                    gameBoardElement.appendChild(cellElement);
+                }
+            }
+        }
+
+        // --- セルクリック処理 ---
+        function handleCellClick(r, c) {
+            if (gameOver) return;
+
+            const clickedCellContent = board[r][c];
+
+            if (selectedPiece) {
+                const validMoves = getValidMoves(selectedPiece.r, selectedPiece.c, selectedPiece.player, selectedPiece.piece);
+                const isMoveValid = validMoves.some(move => move.r === r && move.c === c);
+
+                if (isMoveValid) {
+                    movePiece(selectedPiece.r, selectedPiece.c, r, c);
+                } else if (clickedCellContent && clickedCellContent.player === currentPlayer) {
+                    selectedPiece = { r, c, piece: clickedCellContent.type, player: clickedCellContent.player };
+                    messageDisplayElement.textContent = `${selectedPiece.piece.name}を選択中。`;
+                } else {
+                    messageDisplayElement.textContent = "そこには移動できません。他の駒を選ぶか、有効なマスを選んでください。";
+                    selectedPiece = null; 
+                }
+            } else {
+                if (clickedCellContent && clickedCellContent.player === currentPlayer) {
+                    selectedPiece = { r, c, piece: clickedCellContent.type, player: clickedCellContent.player };
+                    messageDisplayElement.textContent = `${selectedPiece.piece.name}を選択しました。移動先を選んでください。`;
+                } else if (clickedCellContent) {
+                    messageDisplayElement.textContent = "相手の駒です。自分の駒を選んでください。";
+                } else {
+                     messageDisplayElement.textContent = "駒を選んでください。";
+                }
+            }
+            renderBoard();
+        }
+
+        // --- 駒の移動 ---
+        function movePiece(fromR, fromC, toR, toC) {
+            const pieceToMove = board[fromR][fromC];
+            const targetContent = board[toR][toC];
+
+            if (targetContent && targetContent.type === PIECES.LION) {
+                board[toR][toC] = pieceToMove;
+                board[fromR][fromC] = EMPTY_CELL;
+                renderBoard();
+                gameOver = true;
+                messageDisplayElement.textContent = `${currentPlayer === PLAYER_1 ? "プレイヤー1" : "プレイヤー2"} の勝利！ ${targetContent.type.name} を取りました！`;
+                turnDisplayElement.textContent = "ゲーム終了";
+                selectedPiece = null;
+                return;
+            }
+
+            if (targetContent) {
+                 messageDisplayElement.textContent = `${pieceToMove.type.name}で相手の${targetContent.type.name}を取りました！`;
+            } else {
+                 messageDisplayElement.textContent = `${pieceToMove.type.name}を移動しました。`;
+            }
+
+            board[toR][toC] = pieceToMove;
+            board[fromR][fromC] = EMPTY_CELL;
+            
+            selectedPiece = null;
+            switchPlayer();
+        }
+
+        // --- 有効な移動先の取得 (駒の動きルール更新) ---
+        function getValidMoves(r, c, player, pieceType) {
+            const moves = [];
+            let dr, dc; 
+
+            if (!pieceType) return moves;
+
+            // ライオンの動き: 前後左右に1マス
+            if (pieceType === PIECES.LION) {
+                const deltas = [ [-1, 0], [1, 0], [0, -1], [0, 1] ]; // 上, 下, 左, 右
+                for (const [deltaR, deltaC] of deltas) {
+                    const nr = r + deltaR;
+                    const nc = c + deltaC;
+                    if (isValidSquare(nr, nc, player)) moves.push({ r: nr, c: nc });
+                }
+            }
+            // くまの動き: 前に1マス、または斜め前（左右どちらか）に1マス
+            else if (pieceType === PIECES.BEAR) {
+                dr = (player === PLAYER_1) ? -1 : 1; // P1は上へ(行が減る)、P2は下へ(行が増える)
+                // 前
+                if (isValidSquare(r + dr, c, player)) moves.push({ r: r + dr, c: c });
+                // 斜め前（左）
+                if (isValidSquare(r + dr, c - 1, player)) moves.push({ r: r + dr, c: c - 1 });
+                // 斜め前（右）
+                if (isValidSquare(r + dr, c + 1, player)) moves.push({ r: r + dr, c: c + 1 });
+            }
+            // うさぎの動き: 斜め前（左右どちらか）に1マス、または真横（左右どちらか）に1マス
+            else if (pieceType === PIECES.RABBIT) {
+                dr = (player === PLAYER_1) ? -1 : 1; // P1は上へ、P2は下へ
+                // 斜め前（左）
+                if (isValidSquare(r + dr, c - 1, player)) moves.push({ r: r + dr, c: c - 1 });
+                // 斜め前（右）
+                if (isValidSquare(r + dr, c + 1, player)) moves.push({ r: r + dr, c: c + 1 });
+                // 真横（左）
+                if (isValidSquare(r, c - 1, player)) moves.push({ r: r, c: c - 1 });
+                // 真横（右）
+                if (isValidSquare(r, c + 1, player)) moves.push({ r: r, c: c + 1 });
+            }
+            return moves;
+        }
+
+        // --- マスの有効性チェック ---
+        function isValidSquare(r, c, player) {
+            if (r < 0 || r >= BOARD_ROWS || c < 0 || c >= BOARD_COLS) {
+                return false; // 盤外
+            }
+            const targetCell = board[r][c];
+            if (targetCell && targetCell.player === player) {
+                return false; // 移動先に自分の駒
+            }
+            return true; // 空きマス、または相手の駒のマス
+        }
+
+        // --- プレイヤー交代 ---
+        function switchPlayer() {
+            currentPlayer = (currentPlayer === PLAYER_1) ? PLAYER_2 : PLAYER_1;
+            updateTurnDisplay();
+            if (!gameOver) {
+                 messageDisplayElement.textContent = ""; 
+            }
+            renderBoard(); 
+        }
+
+        // --- 表示更新 ---
+        function updateTurnDisplay() {
+            turnDisplayElement.textContent = gameOver ? "ゲーム終了" : `${currentPlayer === PLAYER_1 ? "プレイヤー1 (下側)" : "プレイヤー2 (上側)"} の番です`;
+        }
+
+        // --- イベントリスナー ---
+        resetButtonElement.addEventListener('click', initializeBoard);
+
+        // --- ゲーム開始 ---
+        initializeBoard();
+    </script>
+</body>
+</html>
