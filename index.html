@@ -42,7 +42,7 @@
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             width: 100%; /* 親要素に追従 */
-            max-width: 500px; /* ボード自体の最大幅 */
+            max-width: 540px; /* ボード自体の最大幅を拡大 */
         }
         .board {
             display: grid;
@@ -61,7 +61,7 @@
             align-items: center;
             justify-content: center;
             /* モバイルでのズームを防ぐため、最小フォントサイズを16pxに設定 */
-            font-size: clamp(16px, 5vmin, 2rem); 
+            font-size: clamp(16px, 5vmin, 2.2rem); /* 最大フォントサイズも少し拡大 */
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -95,7 +95,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             text-align: center;
             width: 100%; /* 親要素に追従 */
-            max-width: 500px; /* ボードに合わせる */
+            max-width: 540px; /* ボードに合わせる */
         }
         .info-panel h2 {
             font-size: clamp(1.1rem, 4.5vw, 1.6rem);
@@ -128,7 +128,7 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            width: 280px; /* 固定幅に設定 */
+            width: 240px; /* 固定幅を縮小 */
             flex-shrink: 0; /* このエリアは縮まないようにする */
             align-self: flex-start;
         }
@@ -146,12 +146,16 @@
         }
         .how-to-play .piece-move-explanation {
             margin-bottom: 20px;
+            display: flex; /* 中央寄せのため */
+            flex-direction: column; /* 中央寄せのため */
+            align-items: center; /* 中央寄せのため */
         }
         .how-to-play .piece-name {
             font-weight: bold;
             font-size: clamp(1rem, 3.8vw, 1.2rem);
             margin-bottom: 8px;
             display: block;
+            text-align: center; /* 駒の名前も中央寄せ */
         }
         .piece-p1-example { color: #2563eb; }
         .piece-p2-example { color: #e11d48; }
@@ -167,7 +171,8 @@
             gap: 1px;
             background-color: #cbd5e1;
             border: 1px solid #94a3b8;
-            margin-bottom: 8px;
+            margin-bottom: 8px; /* 下マージンは維持 */
+            /* margin-left: auto; margin-right: auto; /* 中央寄せ */
             width: 86px; 
             height: 86px;
         }
@@ -196,13 +201,39 @@
             }
             .how-to-play {
                 width: 100%; 
-                max-width: 500px; 
+                max-width: 500px; /* ボードに合わせる */
                 margin-top: 24px;
                 align-self: center;
             }
             .board-container, .info-panel {
                  width: 100%; 
-                 max-width: 500px;
+                 max-width: 500px; /* モバイルでは最大幅を500pxに戻す */
+            }
+             .board-container { /* モバイルでのボードの最大幅を少し調整 */
+                max-width: 480px;
+            }
+            .info-panel {
+                max-width: 480px;
+            }
+        }
+         /* さらに小さい画面用の調整 */
+        @media (max-width: 380px) {
+            .how-to-play {
+                padding: 15px; /* パディングを少し減らす */
+            }
+            .move-grid {
+                grid-template-columns: repeat(3, 24px); 
+                grid-template-rows: repeat(3, 24px);
+                width: 74px; 
+                height: 74px;
+            }
+            .move-grid-cell {
+                width: 24px;
+                height: 24px;
+                font-size: 1rem; 
+            }
+             .cell {
+                font-size: clamp(16px, 6vmin, 1.8rem); /* さらに小さい画面での駒サイズ調整 */
             }
         }
     </style>
