@@ -9,84 +9,150 @@
         /* カスタムスタイル */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f0f9ff; /* 背景色 (水色系) */
+            background-color: #f0f9ff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* 上寄せに変更 */
+            justify-content: center; 
             min-height: 100vh;
             margin: 0;
-            padding: 20px; /* 上下のパディングを少し増やす */
+            padding: 20px;
             box-sizing: border-box;
+            position: relative; /* 遊び方ボタンの位置基準のため */
         }
+
+        /* 遊び方ボタン */
+        .how-to-play-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #3b82f6;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            cursor: pointer;
+            z-index: 1000; /* 他の要素より手前に表示 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .how-to-play-button:hover {
+            background-color: #2563eb;
+        }
+
         .game-container {
             display: flex;
-            flex-direction: row; /* PCでは横並びを基本とする */
-            flex-wrap: nowrap;   /* 折り返さないようにする */
-            justify-content: center; /* 中央揃え */
-            align-items: flex-start; /* 上端揃え */
-            gap: 24px;
+            justify-content: center; 
+            align-items: center; 
             width: 100%;
-            max-width: 1000px; /* 全体の最大幅を少し広げる */
         }
         .board-and-info-panel {
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex-grow: 1; /* 残りのスペースを埋める */
-            min-width: 0; /* flexアイテムの縮小対策 */
+            width: 100%; 
+            max-width: 540px; 
         }
         .board-container {
             background-color: #ffffff;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            width: 100%; /* 親要素に追従 */
-            max-width: 540px; /* ボード自体の最大幅を拡大 */
+            width: 100%; 
         }
         .board {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            width: 100%; /* コンテナに合わせる */
-            aspect-ratio: 5 / 4; /* 縦横比を固定 */
+            width: 100%;
+            aspect-ratio: 5 / 4;
             border: 2px solid #60a5fa;
             border-radius: 8px;
             gap: 2px;
             background-color: #93c5fd;
         }
         .cell {
-            background-color: #eff6ff;
+            background-color: #eff6ff; 
             display: flex;
             align-items: center;
             justify-content: center;
-            /* モバイルでのズームを防ぐため、最小フォントサイズを16pxに設定 */
-            font-size: clamp(16px, 5vmin, 2.2rem); /* 最大フォントサイズも少し拡大 */
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s;
-            border: 1px solid #dbeafe;
+            border: 1px solid #dbeafe; 
             border-radius: 4px;
+            position: relative; 
+            overflow: visible; 
         }
         .cell:hover {
             background-color: #dbeafe;
         }
-        .piece-p1 { color: #2563eb; }
-        .piece-p2 .piece-symbol {
-            display: inline-block;
-            transform: rotate(180deg);
+
+        .goal-line-row-0 { 
+            border-bottom: 4px solid rgba(37, 99, 235, 0.7) !important; 
         }
-        .piece-p2 { color: #e11d48; }
+        .goal-line-row-2 { 
+            border-bottom: 4px solid rgba(225, 29, 72, 0.7) !important;
+        }
 
+        .piece-container {
+            position: relative;
+            display: flex;
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center; 
+            width: 100%;
+            height: 100%;
+        }
+        
+        .cookie {
+            position: absolute;
+            z-index: 0; 
+            opacity: 0.7; 
+        }
+        .cookie-lion { 
+            width: 70%;
+            padding-bottom: 70%; 
+            border-radius: 50%;
+            bottom: 10%; 
+        }
+        .cookie-bear { 
+            width: 70%; 
+            height: 70%;
+            transform: rotate(45deg) scale(0.9); 
+            border-radius: 15%; 
+            bottom: 10%;
+        }
+        .cookie-rabbit { 
+            width: 70%;
+            height: 55%; 
+            border-radius: 8px;
+            bottom: 15%; 
+        }
+        
+        .piece-p1 .cookie { background-color: rgba(37, 99, 235, 0.25); } 
+        .piece-p2 .cookie { background-color: rgba(225, 29, 72, 0.25); } 
+        
+        .piece-symbol {
+            position: relative; 
+            z-index: 1; 
+            line-height: 1; 
+            font-size: clamp(16px, calc(0.3 * (100vmin / 4)), 2.5rem); 
+        }
+        
+        .piece-p1 .piece-symbol { color: #1d4ed8; } 
+        .piece-p2 .piece-symbol { color: #c2145b; display: inline-block; transform: rotate(180deg); } 
 
-        .selected {
-            background-color: #fcd34d !important;
-            outline: 3px solid #f59e0b;
+        .selected-p1 {
+            background-color: rgba(59, 130, 246, 0.25) !important; 
+        }
+        .selected-p2 {
+            background-color: rgba(236, 72, 153, 0.25) !important; 
         }
         .valid-move {
-            background-color: #86efac !important;
-            outline: 3px solid #16a34a;
+            background-color: #a7f3d0 !important; 
         }
+
         .info-panel {
             margin-top: 20px;
             padding: 15px;
@@ -94,8 +160,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             text-align: center;
-            width: 100%; /* 親要素に追従 */
-            max-width: 540px; /* ボードに合わせる */
+            width: 100%; 
         }
         .info-panel h2 {
             font-size: clamp(1.1rem, 4.5vw, 1.6rem);
@@ -103,143 +168,145 @@
             color: #1e3a8a;
         }
         .info-panel p {
-            font-size: clamp(0.9rem, 3.5vw, 1.1rem); /* ボタン以外のテキストは元のまま */
+            font-size: clamp(0.9rem, 3.5vw, 1.1rem);
             color: #374151;
             margin-bottom: 8px;
         }
-        button {
+        /* ゲーム終了テキストのスタイル */
+        .game-over-text {
+            font-weight: bold;
+            font-size: 1.5em; /* 親要素のフォントサイズの1.5倍 */
+            color: #dc2626; /* 少し目立つ色 (例: 赤系) */
+        }
+
+        button#resetButton { /* IDセレクタで明確化 */
             background-color: #3b82f6;
             color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 6px;
-            font-size: clamp(1rem, 3.5vw, 1.1rem); /* ボタンの最小フォントサイズも16px(1rem)に */
+            font-size: clamp(1rem, 3.5vw, 1.1rem);
             cursor: pointer;
             transition: background-color 0.2s;
             margin-top: 10px;
         }
-        button:hover {
+        button#resetButton:hover {
             background-color: #2563eb;
         }
 
-        /* 操作説明エリア */
-        .how-to-play {
+        /* 遊び方モーダル */
+        .how-to-play-modal {
+            display: none; /* 初期状態は非表示 */
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 360px; /* モーダルの幅 */
             background-color: #ffffff;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.15);
+            z-index: 1001; 
+            overflow-y: auto; 
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            width: 240px; /* 固定幅を縮小 */
-            flex-shrink: 0; /* このエリアは縮まないようにする */
-            align-self: flex-start;
+            transition: transform 0.3s ease-out;
+            transform: translateX(100%); 
         }
-        .how-to-play h3 {
+        .how-to-play-modal.active {
+            display: block;
+            transform: translateX(0); 
+        }
+        .how-to-play-modal h3 {
             font-size: clamp(1.1rem, 4.5vw, 1.5rem);
             color: #1e3a8a;
+            margin-top: 0; 
             margin-bottom: 16px;
             border-bottom: 2px solid #60a5fa;
             padding-bottom: 8px;
         }
-        .how-to-play p {
+        .how-to-play-modal p, .how-to-play-modal ul {
             font-size: clamp(0.85rem, 3vw, 1rem);
             color: #374151;
             margin-bottom: 10px;
         }
-        .how-to-play .piece-move-explanation {
-            margin-bottom: 20px;
-            display: flex; /* 中央寄せのため */
-            flex-direction: column; /* 中央寄せのため */
-            align-items: center; /* 中央寄せのため */
+        .how-to-play-modal ul { list-style: none; padding-left: 0; }
+        .how-to-play-modal li { margin-bottom: 8px; padding-left: 20px; position: relative; }
+        .how-to-play-modal li::before { content: "🐾"; position: absolute; left: 0; color: #60a5fa; }
+        .how-to-play-modal .piece-move-explanation { margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
+        .how-to-play-modal .piece-name { 
+            font-weight: bold; 
+            font-size: clamp(1rem, 3.8vw, 1.2rem); 
+            margin-bottom: 8px; 
+            display: block; 
+            text-align: center; 
         }
-        .how-to-play .piece-name {
+        /* 駒の名前の色分け用クラス */
+        .piece-name-p1 { color: #1d4ed8; } /* 青 */
+        .piece-name-p2 { color: #c2145b; } /* 赤 */
+
+        .piece-p1-example { color: #1d4ed8; } 
+        .piece-p2-example { color: #c2145b; } 
+        /* .piece-p2-example .piece-symbol-example { display: inline-block; transform: rotate(180deg); } /* 遊び方では回転させない */
+
+        .move-grid { display: grid; grid-template-columns: repeat(3, 28px); grid-template-rows: repeat(3, 28px); gap: 1px; background-color: #cbd5e1; border: 1px solid #94a3b8; margin-bottom: 8px; width: 86px; height: 86px; }
+        .move-grid-cell { width: 28px; height: 28px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .move-grid-cell.piece { /* JSでスタイル適用 */ }
+        .move-grid-cell.highlight { background-color: #86efac; outline: 1px solid #16a34a; }
+        
+        .modal-close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.8rem;
             font-weight: bold;
-            font-size: clamp(1rem, 3.8vw, 1.2rem);
-            margin-bottom: 8px;
+            color: #6b7280;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .modal-close-button:hover {
+            color: #1f2937;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.3); 
+            z-index: 1000; 
+        }
+        .modal-overlay.active {
             display: block;
-            text-align: center; /* 駒の名前も中央寄せ */
-        }
-        .piece-p1-example { color: #2563eb; }
-        .piece-p2-example { color: #e11d48; }
-        .piece-p2-example .piece-symbol-example {
-            display: inline-block;
-            transform: rotate(180deg);
         }
 
-        .move-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 28px); 
-            grid-template-rows: repeat(3, 28px);
-            gap: 1px;
-            background-color: #cbd5e1;
-            border: 1px solid #94a3b8;
-            margin-bottom: 8px; /* 下マージンは維持 */
-            /* margin-left: auto; margin-right: auto; /* 中央寄せ */
-            width: 86px; 
-            height: 86px;
-        }
-        .move-grid-cell {
-            width: 28px;
-            height: 28px;
-            background-color: #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem; 
-        }
-        .move-grid-cell.piece {
-            /* スタイルはJSで適用 */
-        }
-        .move-grid-cell.highlight {
-            background-color: #86efac;
-            outline: 1px solid #16a34a;
-        }
 
-        /* モバイル用調整: 画面幅が820px以下の場合 */
         @media (max-width: 820px) { 
-            .game-container {
-                flex-direction: column;
-                align-items: center;
+            .board-and-info-panel {
+                max-width: 500px; 
             }
-            .how-to-play {
-                width: 100%; 
-                max-width: 500px; /* ボードに合わせる */
-                margin-top: 24px;
-                align-self: center;
-            }
-            .board-container, .info-panel {
-                 width: 100%; 
-                 max-width: 500px; /* モバイルでは最大幅を500pxに戻す */
-            }
-             .board-container { /* モバイルでのボードの最大幅を少し調整 */
-                max-width: 480px;
-            }
-            .info-panel {
-                max-width: 480px;
+            .how-to-play-modal {
+                width: 260px; 
             }
         }
-         /* さらに小さい画面用の調整 */
         @media (max-width: 380px) {
-            .how-to-play {
-                padding: 15px; /* パディングを少し減らす */
+            .piece-symbol { font-size: clamp(16px, calc(0.3 * (100vmin / 4)), 1.8rem); } 
+            .cookie-lion { width: 68%; padding-bottom: 68%; bottom: 12%;}
+            .cookie-bear { width: 68%; height: 68%; bottom: 12%; transform: rotate(45deg) scale(0.85);}
+            .cookie-rabbit { width: 68%; height: 50%; bottom: 18%;}
+            .how-to-play-modal {
+                width: 90%; 
+                padding: 15px;
             }
-            .move-grid {
-                grid-template-columns: repeat(3, 24px); 
-                grid-template-rows: repeat(3, 24px);
-                width: 74px; 
-                height: 74px;
-            }
-            .move-grid-cell {
-                width: 24px;
-                height: 24px;
-                font-size: 1rem; 
-            }
-             .cell {
-                font-size: clamp(16px, 6vmin, 1.8rem); /* さらに小さい画面での駒サイズ調整 */
-            }
+            .move-grid { grid-template-columns: repeat(3, 24px); grid-template-rows: repeat(3, 24px); width: 74px; height: 74px; }
+            .move-grid-cell { width: 24px; height: 24px; font-size: 1rem; }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
+    <button class="how-to-play-button" id="howToPlayButton">あそびかた</button>
+
+    <div class="game-container"> 
         <div class="board-and-info-panel">
             <div class="board-container">
                 <div id="gameBoard" class="board">
@@ -252,17 +319,21 @@
                 <button id="resetButton">ゲームリセット</button>
             </div>
         </div>
-
-        <div class="how-to-play">
-            <h3>あそびかた</h3>
-            <p><strong>もくてき:</strong> あいての <span class="piece-p1-example">ライオン</span><span class="piece-symbol-example">🦁</span> をつかまえたら勝ち！</p>
-            
-            <h4>駒のうごき</h4>
-            <div id="pieceMoveExamplesContainer">
-                </div>
-            <p><small>※ <span class="piece-p1-example">青い駒</span>があなた (下側)、<span class="piece-p2-example">赤い駒 (<span class="piece-symbol-example">例：</span><span class="piece-p2-example piece-symbol-example">🐺</span>)</span>があいて (上側) です。</small></p>
-        </div>
     </div>
+
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="how-to-play-modal" id="howToPlayModal">
+        <button class="modal-close-button" id="modalCloseButton">&times;</button>
+        <h3>あそびかた</h3>
+        <ul id="victoryConditionsList">
+            </ul>
+        
+        <h4>駒のうごき</h4>
+        <div id="pieceMoveExamplesContainerModal">
+            </div>
+        <p><small>※ <span class="piece-p1-example">青い駒</span>があなた (下側)、<span class="piece-p2-example">赤い駒 (例：🐺)</span>があいて (上側) です。</small></p>
+    </div>
+
 
     <script>
         // --- 定数定義 ---
@@ -273,21 +344,27 @@
         const PIECES = {
             LION: { 
                 name: "ライオン", 
+                p2Name: "オオカミ", 
                 p1Symbol: "🦁", 
                 p2Symbol: "🐺",
+                cookieClass: "cookie-lion", 
                 moves: [ [-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1] ] 
             },
             BEAR: { 
                 name: "くま", 
+                p2Name: "パンダ",
                 p1Symbol: "🐻", 
                 p2Symbol: "🐼",
+                cookieClass: "cookie-bear", 
                 movesP1: [ [-1,-1], [-1,0], [-1,1] ], 
                 movesP2: [ [1,-1], [1,0], [1,1] ]    
             },
             RABBIT: { 
                 name: "うさぎ", 
+                p2Name: "キツネ",
                 p1Symbol: "🐰", 
                 p2Symbol: "🦊",
+                cookieClass: "cookie-rabbit", 
                 movesP1: [ [-1,-1], [-1,1], [0,-1], [0,1] ], 
                 movesP2: [ [1,-1], [1,1], [0,-1], [0,1] ]    
             }
@@ -305,8 +382,13 @@
         const turnDisplayElement = document.getElementById('turnDisplay');
         const messageDisplayElement = document.getElementById('messageDisplay');
         const resetButtonElement = document.getElementById('resetButton');
-        const pieceMoveExamplesContainer = document.getElementById('pieceMoveExamplesContainer');
-
+        
+        const howToPlayButton = document.getElementById('howToPlayButton');
+        const howToPlayModal = document.getElementById('howToPlayModal');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const pieceMoveExamplesContainerModal = document.getElementById('pieceMoveExamplesContainerModal');
+        const victoryConditionsList = document.getElementById('victoryConditionsList');
 
         function createMoveExampleGrid(pieceKey, playerForExample) {
             const pieceInfo = PIECES[pieceKey];
@@ -315,24 +397,8 @@
 
             const nameSpan = document.createElement('span');
             nameSpan.classList.add('piece-name');
-            nameSpan.textContent = `${pieceInfo.name} (`;
-            
-            const p1SymbolSpan = document.createElement('span');
-            p1SymbolSpan.classList.add('piece-p1-example');
-            p1SymbolSpan.textContent = pieceInfo.p1Symbol;
-            nameSpan.appendChild(p1SymbolSpan);
-            
-            nameSpan.append(" / ");
-
-            const p2SymbolSpan = document.createElement('span');
-            p2SymbolSpan.classList.add('piece-p2-example');
-            const p2InnerSymbol = document.createElement('span');
-            p2InnerSymbol.classList.add('piece-symbol-example'); 
-            p2InnerSymbol.textContent = pieceInfo.p2Symbol;
-            p2SymbolSpan.appendChild(p2InnerSymbol);
-            nameSpan.appendChild(p2SymbolSpan);
-
-            nameSpan.append(")");
+            // 修正点：駒の名前と絵文字を結合し、重複括弧を削除
+            nameSpan.innerHTML = `<span class="piece-name-p1">${pieceInfo.name}${pieceInfo.p1Symbol}</span> / <span class="piece-name-p2">${pieceInfo.p2Name}${pieceInfo.p2Symbol}</span>`;
             exampleDiv.appendChild(nameSpan);
 
             const grid = document.createElement('div');
@@ -346,38 +412,55 @@
             } else if (playerForExample === PLAYER_1 && pieceInfo.movesP1) {
                 moveDeltas = pieceInfo.movesP1;
             } else if (playerForExample === PLAYER_2 && pieceInfo.movesP2) {
-                moveDeltas = pieceInfo.movesP2;
+                moveDeltas = pieceInfo.movesP1; 
             }
 
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('move-grid-cell');
-                    if (r === centerR && c === centerC) {
-                        cell.classList.add('piece');
-                        cell.textContent = pieceInfo.p1Symbol; 
-                        cell.style.color = '#2563eb'; // P1カラーで固定
+            for (let r_grid = 0; r_grid < 3; r_grid++) {
+                for (let c_grid = 0; c_grid < 3; c_grid++) {
+                    const cell_grid = document.createElement('div');
+                    cell_grid.classList.add('move-grid-cell');
+                    if (r_grid === centerR && c_grid === centerC) {
+                        cell_grid.classList.add('piece');
+                        cell_grid.textContent = pieceInfo.p1Symbol; 
+                        cell_grid.style.color = '#1d4ed8'; 
                     } else {
-                        const dr = r - centerR;
-                        const dc = c - centerC;
+                        const dr = r_grid - centerR;
+                        const dc = c_grid - centerC;
                         if (moveDeltas.some(delta => delta[0] === dr && delta[1] === dc)) {
-                            cell.classList.add('highlight');
+                            cell_grid.classList.add('highlight');
                         }
                     }
-                    grid.appendChild(cell);
+                    grid.appendChild(cell_grid);
                 }
             }
             exampleDiv.appendChild(grid);
             return exampleDiv;
         }
 
-        function populateMoveExamples() {
-            pieceMoveExamplesContainer.innerHTML = ''; 
-            pieceMoveExamplesContainer.appendChild(createMoveExampleGrid('LION', PLAYER_1));
-            pieceMoveExamplesContainer.appendChild(createMoveExampleGrid('BEAR', PLAYER_1));
-            pieceMoveExamplesContainer.appendChild(createMoveExampleGrid('RABBIT', PLAYER_1));
+        function populateVictoryConditions() {
+            victoryConditionsList.innerHTML = ''; 
+            const condition1 = document.createElement('li');
+            // 修正点：ライオンとオオカミの名前と絵文字をそれぞれ色分け
+            condition1.innerHTML = `あいてのリーダー（ <span class="piece-name-p1">${PIECES.LION.name}${PIECES.LION.p1Symbol}</span><span class="piece-p1-example"></span>/<span class="piece-name-p2">${PIECES.LION.p2Name}${PIECES.LION.p2Symbol}</span><span class="piece-p2-example"></span> ）をつかまえるとかつぞ！。`;
+            victoryConditionsList.appendChild(condition1);
+
+            const condition2 = document.createElement('li');
+            condition2.innerHTML = `または、じぶんの <span class="piece-name-p1">${PIECES.LION.name}${PIECES.LION.p1Symbol}</span><span class="piece-p1-example"></span>/<span class="piece-name-p2">${PIECES.LION.p2Name}${PIECES.LION.p2Symbol}</span><span class="piece-p2-example"></span> があいての一番奥の列にとうたつするとかつぞ！。`;
+            victoryConditionsList.appendChild(condition2);
+
+            // 新しいルール文の追加
+            const condition3 = document.createElement('li');
+            condition3.textContent = "いろいろな形と色のクッキーを持っているどうぶつがあいてのクッキーを取り合うぞ！";
+            victoryConditionsList.appendChild(condition3);
         }
 
+
+        function populateMoveExamplesInModal() {
+            pieceMoveExamplesContainerModal.innerHTML = ''; 
+            pieceMoveExamplesContainerModal.appendChild(createMoveExampleGrid('LION', PLAYER_1));
+            pieceMoveExamplesContainerModal.appendChild(createMoveExampleGrid('BEAR', PLAYER_1));
+            pieceMoveExamplesContainerModal.appendChild(createMoveExampleGrid('RABBIT', PLAYER_1));
+        }
 
         function initializeBoard() {
             board = Array(BOARD_ROWS).fill(null).map(() => Array(BOARD_COLS).fill(EMPTY_CELL));
@@ -399,7 +482,8 @@
             board[0][3] = { type: PIECES.RABBIT, player: PLAYER_2 };
             board[0][4] = { type: PIECES.BEAR, player: PLAYER_2 };
             
-            populateMoveExamples(); 
+            populateVictoryConditions(); 
+            populateMoveExamplesInModal(); 
             renderBoard();
         }
 
@@ -412,22 +496,43 @@
                     cellElement.dataset.r = r;
                     cellElement.dataset.c = c;
 
+                    cellElement.classList.remove('goal-line-row-0', 'goal-line-row-2'); 
+                    if (r === 0) { 
+                        cellElement.classList.add('goal-line-row-0'); 
+                    }
+                    if (r === 2) { 
+                        cellElement.classList.add('goal-line-row-2');
+                    }
+
                     const pieceData = board[r][c];
                     if (pieceData) {
+                        const pieceContainer = document.createElement('div');
+                        pieceContainer.classList.add('piece-container');
+                        
+                        const cookieElement = document.createElement('div');
+                        cookieElement.classList.add('cookie', pieceData.type.cookieClass);
+                        pieceContainer.appendChild(cookieElement);
+
                         const symbolSpan = document.createElement('span');
                         symbolSpan.classList.add('piece-symbol'); 
                         symbolSpan.textContent = pieceData.player === PLAYER_1 ? pieceData.type.p1Symbol : pieceData.type.p2Symbol;
-                        cellElement.appendChild(symbolSpan);
-                        cellElement.classList.add(pieceData.player === PLAYER_1 ? 'piece-p1' : 'piece-p2');
+                        pieceContainer.appendChild(symbolSpan);
+                        
+                        cellElement.appendChild(pieceContainer);
+                        if (pieceData.player === PLAYER_1) {
+                            cellElement.classList.add('piece-p1');
+                        } else {
+                            cellElement.classList.add('piece-p2');
+                        }
                     }
 
                     if (selectedPiece && selectedPiece.r === r && selectedPiece.c === c) {
-                        cellElement.classList.add('selected');
+                        cellElement.classList.add(selectedPiece.player === PLAYER_1 ? 'selected-p1' : 'selected-p2');
                     }
 
                     if (selectedPiece) {
-                        const validMoves = getValidMoves(selectedPiece.r, selectedPiece.c, selectedPiece.player, selectedPiece.piece);
-                        if (validMoves.some(move => move.r === r && move.c === c)) {
+                        const validMovesForHighlight = getValidMoves(selectedPiece.r, selectedPiece.c, selectedPiece.player, selectedPiece.piece);
+                        if (validMovesForHighlight.some(move => move.r === r && move.c === c)) {
                             cellElement.classList.add('valid-move');
                         }
                     }
@@ -440,7 +545,6 @@
 
         function handleCellClick(r, c) {
             if (gameOver) return;
-
             const clickedCellContent = board[r][c];
 
             if (selectedPiece) {
@@ -451,7 +555,7 @@
                     movePiece(selectedPiece.r, selectedPiece.c, r, c);
                 } else if (clickedCellContent && clickedCellContent.player === currentPlayer) {
                     selectedPiece = { r, c, piece: clickedCellContent.type, player: clickedCellContent.player };
-                    messageDisplayElement.textContent = `${selectedPiece.piece.name}をせんたく中。`;
+                    messageDisplayElement.textContent = `${selectedPiece.piece.player === PLAYER_1 ? selectedPiece.piece.name : selectedPiece.piece.p2Name}をせんたく中。`;
                 } else {
                     messageDisplayElement.textContent = "そこにはうごけません。ほかの駒をえらぶか、ゆうこうなマスをえらんでください。";
                     selectedPiece = null; 
@@ -459,7 +563,7 @@
             } else {
                 if (clickedCellContent && clickedCellContent.player === currentPlayer) {
                     selectedPiece = { r, c, piece: clickedCellContent.type, player: clickedCellContent.player };
-                    messageDisplayElement.textContent = `${selectedPiece.piece.name}をせんたくしました。いどう先をえらんでください。`;
+                    messageDisplayElement.textContent = `${selectedPiece.piece.player === PLAYER_1 ? selectedPiece.piece.name : selectedPiece.piece.p2Name}をせんたくしました。いどう先をえらんでください。`;
                 } else if (clickedCellContent) {
                     messageDisplayElement.textContent = "あいての駒です。じぶんの駒をえらんでください。";
                 } else {
@@ -471,27 +575,49 @@
 
         function movePiece(fromR, fromC, toR, toC) {
             const pieceToMove = board[fromR][fromC];
-            const targetContent = board[toR][toC];
+            const targetContent = board[toR][toC]; 
+            const movingPieceDisplayName = pieceToMove.player === PLAYER_1 ? pieceToMove.type.name : pieceToMove.type.p2Name;
+            const targetPieceDisplayName = targetContent ? (targetContent.player === PLAYER_1 ? targetContent.type.name : targetContent.type.p2Name) : "";
 
-            if (targetContent && targetContent.type === PIECES.LION) {
-                board[toR][toC] = pieceToMove;
-                board[fromR][fromC] = EMPTY_CELL;
-                renderBoard();
+
+            if (targetContent && targetContent.type === PIECES.LION && targetContent.player !== currentPlayer) {
+                board[toR][toC] = pieceToMove; 
+                board[fromR][fromC] = EMPTY_CELL; 
+                renderBoard(); 
                 gameOver = true;
-                messageDisplayElement.textContent = `${currentPlayer === PLAYER_1 ? "プレイヤー1" : "プレイヤー2"} の勝ち！ ${targetContent.type.name} をつかまえた！`;
-                turnDisplayElement.textContent = "ゲームしゅうりょう";
+                messageDisplayElement.textContent = `${currentPlayer === PLAYER_1 ? "プレイヤー1" : "プレイヤー2"} の勝ち！ あいての${targetPieceDisplayName} をつかまえた！`;
+                turnDisplayElement.innerHTML = '<span class="game-over-text">ゲームしゅうりょう</span>';
                 selectedPiece = null;
                 return;
             }
 
-            if (targetContent) {
-                 messageDisplayElement.textContent = `${pieceToMove.type.name}であいての${targetContent.type.name}をつかまえた！`;
-            } else {
-                 messageDisplayElement.textContent = `${pieceToMove.type.name}をうごかしました。`;
-            }
-
             board[toR][toC] = pieceToMove;
             board[fromR][fromC] = EMPTY_CELL;
+
+            if (targetContent) { 
+                 messageDisplayElement.textContent = `${movingPieceDisplayName}であいての${targetPieceDisplayName}をつかまえた！`;
+            } else { 
+                 messageDisplayElement.textContent = `${movingPieceDisplayName}をうごかしました。`;
+            }
+            
+            if (pieceToMove.type === PIECES.LION) {
+                if (currentPlayer === PLAYER_1 && toR === 0) { 
+                    renderBoard();
+                    gameOver = true;
+                    messageDisplayElement.textContent = `プレイヤー1 の勝ち！ ${movingPieceDisplayName}があいてのゴールについた！`;
+                    turnDisplayElement.innerHTML = '<span class="game-over-text">ゲームしゅうりょう</span>';
+                    selectedPiece = null;
+                    return;
+                } 
+                else if (currentPlayer === PLAYER_2 && toR === BOARD_ROWS - 1) { 
+                    renderBoard();
+                    gameOver = true;
+                    messageDisplayElement.textContent = `プレイヤー2 の勝ち！ ${movingPieceDisplayName}があいてのゴールについた！`;
+                    turnDisplayElement.innerHTML = '<span class="game-over-text">ゲームしゅうりょう</span>';
+                    selectedPiece = null;
+                    return;
+                }
+            }
             
             selectedPiece = null;
             switchPlayer();
@@ -519,31 +645,42 @@
         }
 
         function isValidSquare(r, c, player) {
-            if (r < 0 || r >= BOARD_ROWS || c < 0 || c >= BOARD_COLS) {
-                return false;
-            }
+            if (r < 0 || r >= BOARD_ROWS || c < 0 || c >= BOARD_COLS) { return false; }
             const targetCell = board[r][c];
-            if (targetCell && targetCell.player === player) {
-                return false;
-            }
+            if (targetCell && targetCell.player === player) { return false; }
             return true; 
         }
 
         function switchPlayer() {
             currentPlayer = (currentPlayer === PLAYER_1) ? PLAYER_2 : PLAYER_1;
             updateTurnDisplay();
-            if (!gameOver) {
-                 messageDisplayElement.textContent = ""; 
-            }
+            if (!gameOver) { messageDisplayElement.textContent = ""; }
             renderBoard(); 
         }
 
         function updateTurnDisplay() {
-            turnDisplayElement.textContent = gameOver ? "ゲームしゅうりょう" : `${currentPlayer === PLAYER_1 ? "プレイヤー1 (下側)" : "プレイヤー2 (上側)"} の番です`;
+            if (!gameOver) {
+                turnDisplayElement.textContent = `${currentPlayer === PLAYER_1 ? "プレイヤー1 (下側)" : "プレイヤー2 (上側)"} の番です`;
+            }
         }
 
-        resetButtonElement.addEventListener('click', initializeBoard);
+        howToPlayButton.addEventListener('click', () => {
+            howToPlayModal.classList.add('active');
+            modalOverlay.classList.add('active');
+        });
 
+        modalCloseButton.addEventListener('click', () => {
+            howToPlayModal.classList.remove('active');
+            modalOverlay.classList.remove('active');
+        });
+
+        modalOverlay.addEventListener('click', () => { 
+            howToPlayModal.classList.remove('active');
+            modalOverlay.classList.remove('active');
+        });
+
+
+        resetButtonElement.addEventListener('click', initializeBoard);
         initializeBoard();
     </script>
 </body>
